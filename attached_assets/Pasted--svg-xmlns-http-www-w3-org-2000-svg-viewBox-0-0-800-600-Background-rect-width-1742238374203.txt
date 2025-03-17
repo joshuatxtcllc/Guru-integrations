@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- Calendar Table -->
+  <rect x="50" y="50" width="180" height="220" rx="5" fill="#4285F4" opacity="0.1" stroke="#4285F4" stroke-width="2"/>
+  <rect x="50" y="50" width="180" height="30" rx="5" fill="#4285F4"/>
+  <text x="140" y="70" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">Calendar</text>
+  
+  <text x="60" y="100" font-family="Arial" font-size="12">Order ID (PK)</text>
+  <text x="60" y="120" font-family="Arial" font-size="12">Date Due</text>
+  <text x="60" y="140" font-family="Arial" font-size="12">Name</text>
+  <text x="60" y="160" font-family="Arial" font-size="12">Description</text>
+  <text x="60" y="180" font-family="Arial" font-size="12">Order Progress</text>
+  <text x="60" y="200" font-family="Arial" font-size="12">Moulding ID (FK)</text>
+  <text x="60" y="220" font-family="Arial" font-size="12">Mat ID (FK)</text>
+  <text x="60" y="240" font-family="Arial" font-size="12">Fabric ID (FK)</text>
+  
+  <!-- OrderLookup Table -->
+  <rect x="310" y="150" width="180" height="220" rx="5" fill="#34A853" opacity="0.1" stroke="#34A853" stroke-width="2"/>
+  <rect x="310" y="150" width="180" height="30" rx="5" fill="#34A853"/>
+  <text x="400" y="170" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">OrderLookup</text>
+  
+  <text x="320" y="200" font-family="Arial" font-size="12">Order ID (PK)</text>
+  <text x="320" y="220" font-family="Arial" font-size="12">Customer Name</text>
+  <text x="320" y="240" font-family="Arial" font-size="12">Description</text>
+  <text x="320" y="260" font-family="Arial" font-size="12">Moulding ID (FK)</text>
+  <text x="320" y="280" font-family="Arial" font-size="12">Mat ID (FK)</text>
+  <text x="320" y="300" font-family="Arial" font-size="12">Fabric ID (FK)</text>
+  <text x="320" y="320" font-family="Arial" font-size="12">Glass ID (FK)</text>
+  <text x="320" y="340" font-family="Arial" font-size="12">Progress (from Moulding)</text>
+  
+  <!-- Moulding Table -->
+  <rect x="570" y="50" width="180" height="160" rx="5" fill="#EA4335" opacity="0.1" stroke="#EA4335" stroke-width="2"/>
+  <rect x="570" y="50" width="180" height="30" rx="5" fill="#EA4335"/>
+  <text x="660" y="70" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">Moulding</text>
+  
+  <text x="580" y="100" font-family="Arial" font-size="12">Material ID (PK)</text>
+  <text x="580" y="120" font-family="Arial" font-size="12">Order ID (FK)</text>
+  <text x="580" y="140" font-family="Arial" font-size="12">Description</text>
+  <text x="580" y="160" font-family="Arial" font-size="12">Progress Bar</text>
+  <text x="580" y="180" font-family="Arial" font-size="12">Notes</text>
+  
+  <!-- Mat Table -->
+  <rect x="570" y="230" width="180" height="160" rx="5" fill="#FBBC05" opacity="0.1" stroke="#FBBC05" stroke-width="2"/>
+  <rect x="570" y="230" width="180" height="30" rx="5" fill="#FBBC05"/>
+  <text x="660" y="250" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">Mat</text>
+  
+  <text x="580" y="280" font-family="Arial" font-size="12">Material ID (PK)</text>
+  <text x="580" y="300" font-family="Arial" font-size="12">Order ID (FK)</text>
+  <text x="580" y="320" font-family="Arial" font-size="12">Description</text>
+  <text x="580" y="340" font-family="Arial" font-size="12">Progress Bar</text>
+  <text x="580" y="360" font-family="Arial" font-size="12">Notes</text>
+  
+  <!-- Fabric Table -->
+  <rect x="50" y="350" width="180" height="160" rx="5" fill="#4285F4" opacity="0.1" stroke="#4285F4" stroke-width="2"/>
+  <rect x="50" y="350" width="180" height="30" rx="5" fill="#4285F4"/>
+  <text x="140" y="370" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">Fabric</text>
+  
+  <text x="60" y="400" font-family="Arial" font-size="12">Material ID (PK)</text>
+  <text x="60" y="420" font-family="Arial" font-size="12">Order ID (FK)</text>
+  <text x="60" y="440" font-family="Arial" font-size="12">Description</text>
+  <text x="60" y="460" font-family="Arial" font-size="12">Progress Bar</text>
+  <text x="60" y="480" font-family="Arial" font-size="12">Notes</text>
+  
+  <!-- Glass Table -->
+  <rect x="310" y="400" width="180" height="160" rx="5" fill="#34A853" opacity="0.1" stroke="#34A853" stroke-width="2"/>
+  <rect x="310" y="400" width="180" height="30" rx="5" fill="#34A853"/>
+  <text x="400" y="420" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">Glass</text>
+  
+  <text x="320" y="450" font-family="Arial" font-size="12">Material ID (PK)</text>
+  <text x="320" y="470" font-family="Arial" font-size="12">Order ID (FK)</text>
+  <text x="320" y="490" font-family="Arial" font-size="12">Description</text>
+  <text x="320" y="510" font-family="Arial" font-size="12">Progress Bar</text>
+  <text x="320" y="530" font-family="Arial" font-size="12">Notes</text>
+  
+  <!-- Relationships -->
+  <!-- Calendar to OrderLookup -->
+  <path d="M 230 120 L 310 200" stroke="#4285F4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- OrderLookup to Moulding -->
+  <path d="M 490 260 L 570 120" stroke="#EA4335" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- OrderLookup to Mat -->
+  <path d="M 490 280 L 570 300" stroke="#FBBC05" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- OrderLookup to Fabric -->
+  <path d="M 310 300 L 230 420" stroke="#4285F4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- OrderLookup to Glass -->
+  <path d="M 400 370 L 400 400" stroke="#34A853" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Moulding Progress to all other tables -->
+  <path d="M 660 180 C 700 270 700 500 490 500" stroke="#EA4335" stroke-dasharray="5,5" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 660 180 C 700 390 500 550 400 550" stroke="#EA4335" stroke-dasharray="5,5" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 660 180 C 720 390 350 570 140 480" stroke="#EA4335" stroke-dasharray="5,5" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 660 180 C 680 200 450 360 400 340" stroke="#EA4335" stroke-dasharray="5,5" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Arrow Definitions -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+  
+  <!-- Legend -->
+  <rect x="570" y="500" width="180" height="80" rx="5" fill="white" stroke="#333" stroke-width="1"/>
+  <text x="660" y="520" text-anchor="middle" font-family="Arial" font-weight="bold">Legend</text>
+  
+  <line x1="580" y1="540" x2="600" y2="540" stroke="#333" stroke-width="2"/>
+  <text x="610" y="545" font-family="Arial" font-size="12" dominant-baseline="middle">Primary/Foreign Key</text>
+  
+  <line x1="580" y1="560" x2="600" y2="560" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="610" y="565" font-family="Arial" font-size="12" dominant-baseline="middle">Progress Bar Reference</text>
+</svg>

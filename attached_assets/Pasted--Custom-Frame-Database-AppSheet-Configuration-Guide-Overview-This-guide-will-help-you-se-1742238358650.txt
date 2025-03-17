@@ -1,0 +1,133 @@
+# Custom Frame Database - AppSheet Configuration Guide
+
+## Overview
+
+This guide will help you set up an integrated system for your custom framing business using Google Sheets and AppSheet. It includes:
+
+1. **Table Structure** - How to organize your data
+2. **Data Relationships** - How to link orders to materials
+3. **Progress Tracking** - Using a single progress bar across tables
+4. **AppSheet Configuration** - Setting up your app
+
+## 1. Table Structure
+
+Your database should have the following tables:
+
+| Table | Purpose |
+|-------|---------|
+| Calendar | Main order tracking table (your current CSV) |
+| OrderLookup | Central reference table that connects all components |
+| Moulding | Tracking for frame moulding components |
+| Mat | Tracking for matting components |
+| Fabric | Tracking for fabric components |
+| Glass | Tracking for glass components |
+
+## 2. Data Relationships
+
+The system creates relationships through Order IDs:
+
+```
+Calendar (Order ID)
+    ↓
+OrderLookup (Order ID, Moulding ID, Mat ID, Fabric ID, Glass ID)
+    ↓
+Material Tables (each referencing an Order ID)
+```
+
+This creates a "single source of truth" where changes propagate throughout the system.
+
+## 3. Progress Tracking
+
+The script configures your system to:
+
+- Use the progress bar from the Moulding table as the master progress indicator
+- Automatically update all linked tables when the Moulding progress changes
+- Apply consistent color-coding based on completion percentage
+
+## 4. Google Sheets Setup
+
+1. Create a new Google Sheet and import your CSV data
+2. Open the Script Editor (Extensions > Apps Script)
+3. Add the provided script code
+4. Run the `setupFramingDatabaseRelationships()` function to create your data structure
+5. Run the `setupAppSheetUXPatterns()` function to create AppSheet UX guidelines
+
+## 5. AppSheet Configuration
+
+### Basic Setup:
+
+1. Go to appsheet.com and connect to your Google Sheet
+2. Create an app from the sheet
+3. Define the following tables:
+   - Calendar (Main orders)
+   - OrderLookup (Central reference)
+   - Moulding, Mat, Fabric, Glass (Material tables)
+
+### Views to Create:
+
+1. **Orders Dashboard**
+   - Shows all active orders with progress bars
+   - Group by due date or completion status
+   - Display progress visually
+
+2. **Materials Management**
+   - Tabs for Moulding, Mat, Fabric, Glass
+   - Filter by Order ID
+   - Show availability status
+
+3. **Order Details**
+   - Show all information for a specific order
+   - List all associated materials
+   - Display customer details and contact options
+
+4. **Production Schedule**
+   - Calendar view of orders by due date
+   - Color code by status/priority
+
+### Workflow Automations:
+
+1. **Progress Updates**
+   - When Moulding progress changes, update all related tables
+   - Send notifications at key completion stages
+
+2. **Due Date Alerts**
+   - Notify when orders are approaching due date
+   - Highlight overdue orders
+
+3. **SMS Integration**
+   - Configure SMS notifications for customers
+   - Use the existing SMS templates from your data
+
+## Implementation Steps
+
+1. **Run the Google Sheet Setup**
+   - Follow steps in section 4 to set up your Google Sheet
+
+2. **Connect AppSheet**
+   - Create a new AppSheet app connected to your Google Sheet
+   - When defining tables, establish relationships as described in section 2
+
+3. **Configure Views and Forms**
+   - Create the required views as described in section 5
+   - Set up forms for order entry and updates
+
+4. **Set Up Automations**
+   - Configure workflow actions for progress tracking
+   - Set up notification rules
+
+5. **Test and Refine**
+   - Test with sample orders
+   - Adjust formulas and relationships as needed
+
+## Additional Tips
+
+- Use conditional formatting in Google Sheets to visually track progress
+- Set up data validation rules to ensure consistent data entry
+- Create saved views in AppSheet for different user roles (designer, framer, customer service)
+- Use AppSheet's offline capabilities for workshop usage where internet may be limited
+
+## Support
+
+For additional help configuring AppSheet:
+- Visit the [AppSheet Documentation](https://help.appsheet.com/)
+- Try AppSheet's AI Assistant for app building guidance
