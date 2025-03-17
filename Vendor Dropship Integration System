@@ -1,0 +1,80 @@
+# Frame Guru Vendor Dropshipping Integration
+
+## System Overview
+
+This integration allows Frame Guru to seamlessly process customer orders through Frame Destination and Frame It Easy while maintaining a unified customer experience.
+
+## Integration Architecture
+
+```
+┌─────────────────────────────────┐
+│                                 │
+│     FRAME GURU SYSTEM           │
+│                                 │
+│  ┌─────────────┐ ┌───────────┐  │
+│  │             │ │           │  │
+│  │  Website &  │ │ Admin     │  │
+│  │  E-commerce │ │ Dashboard │  │
+│  │             │ │           │  │
+│  └──────┬──────┘ └─────┬─────┘  │
+│         │              │        │
+│  ┌──────▼──────────────▼─────┐  │
+│  │                           │  │
+│  │  Order Management System  │  │
+│  │                           │  │
+│  └──────────────┬────────────┘  │
+│                 │               │
+└─────────────────┼───────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────┐
+│                                 │
+│  VENDOR INTEGRATION LAYER       │
+│                                 │
+│  ┌─────────────┐ ┌───────────┐  │
+│  │             │ │           │  │
+│  │  Order      │ │ Vendor    │  │
+│  │  Router     │ │ API       │  │
+│  │             │ │ Adapters  │  │
+│  └──────┬──────┘ └─────┬─────┘  │
+│         │              │        │
+└─────────┼──────────────┼────────┘
+          │              │
+          ▼              ▼
+┌──────────────┐  ┌──────────────┐
+│              │  │              │
+│  Frame       │  │  Frame       │
+│  Destination │  │  It Easy     │
+│  API         │  │  API         │
+│              │  │              │
+└──────────────┘  └──────────────┘
+```
+
+## Integration Process Flow
+
+1. Customer places order through Frame Guru website
+2. Order Management System categorizes the order:
+   - Standard size frames → Potential dropship
+   - Complex custom frames → In-house production
+3. Order Router determines best vendor based on:
+   - Product specifications
+   - Pricing optimization
+   - Current vendor capacity/turnaround time
+   - Customer location for shipping optimization
+4. Vendor API Adapter translates Frame Guru order to vendor-specific format
+5. Order is submitted to vendor via API
+6. Vendor confirmation is received and stored in Frame Guru system
+7. Tracking information is passed back to customer when available
+8. Customer communications maintain Frame Guru branding throughout
+
+## Vendor Selection Logic
+
+| Product Type          | Primary Vendor        | Secondary Vendor      | Notes                                        |
+|-----------------------|-----------------------|-----------------------|----------------------------------------------|
+| Standard Wood Frames  | Frame Destination     | Frame It Easy         | Selection based on size, style, and material |
+| Metal Frames          | Frame It Easy         | Frame Destination     | Selection based on style and finish          |
+| Float Mount Frames    | Frame Destination     | In-house              | For standard shadowbox dimensions            |
+| Mat Frames            | Frame It Easy         | Frame Destination     | For standard sizes and basic mat colors      |
+| Museum Glass Options  | Frame Destination     | In-house              | For specialized glass requirements           |
+| Custom Odd Sizes      | In-house              | Frame Destination     | For non-standard dimensions                  |
+| Tier 3 Custom         | In-house only         | N/A                   | High-value custom work stays in-house        |
