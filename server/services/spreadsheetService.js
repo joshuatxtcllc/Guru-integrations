@@ -83,6 +83,123 @@ class SpreadsheetService {
 
     return await sheets.spreadsheets.values.update(request);
   }
+
+  async setupProgressValidation(spreadsheetId, sheetName) {
+    const progressOptions = [
+      "░░░░░░░░░░ 0%",
+      "█░░░░░░░░░ 10%",
+      "██░░░░░░░░ 20%",
+      "███░░░░░░░ 30%",
+      "████░░░░░░ 40%",
+      "█████░░░░░ 50%",
+      "██████░░░░ 60%",
+      "███████░░░ 70%",
+      "████████░░ 80%",
+      "█████████░ 90%",
+      "██████████ 100%"
+    ];
+
+    return await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [{
+          setDataValidation: {
+            range: {
+              sheetId: await this.getSheetId(spreadsheetId, sheetName),
+              startRowIndex: 1,
+              startColumnIndex: 5,
+              endColumnIndex: 6
+            },
+            rule: {
+              condition: {
+                type: 'ONE_OF_LIST',
+                values: progressOptions.map(option => ({ userEnteredValue: option }))
+              },
+              showCustomUi: true,
+              strict: true
+            }
+          }
+        }]
+      }
+    });
+  }
+
+  async standardizeProgressBars(spreadsheetId) {
+    const sheets = ['OrderLookup', 'Mat', 'Fabric', 'Glass'];
+    const mouldingData = await this.getSheetData(spreadsheetId, 'Moulding');
+    
+    for (const sheetName of sheets) {
+      await this.updateProgressFormat(spreadsheetId, sheetName, mouldingData);
+    }
+  }
+
+  async updateProgressFormat(spreadsheetId, sheetName, mouldingData) {
+    const sheetId = await this.getSheetId(spreadsheetId, sheetName);
+    
+    const formatRules = [{
+      ranges: [{
+        sheetId,
+        startRowIndex: 1,
+        startColumnIndex: 5,
+        endColumnIndex: 6
+      }],
+      booleanRule: {
+        condition: {
+          type: 'TEXT_CONTAINS',
+          values: [{ userEnteredValue: '100%' }]
+        },
+        format: {
+          backgroundColor: { red: 0.72, green: 0.88, blue: 0.8 }
+        }
+      }
+    }, {
+      ranges: [{
+        sheetId,
+        startRowIndex: 1,
+        startColumnIndex: 5,
+        endColumnIndex: 6
+      }],
+      booleanRule: {
+        condition: {
+          type: 'TEXT_CONTAINS',
+          values: [{ userEnteredValue: '0%' }]
+        },
+        format: {
+          backgroundColor: { red: 0.96, green: 0.78, blue: 0.76 }
+        }
+      }
+    }];
+
+    return await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [{
+          setConditionalFormatRules: {
+            sheetId,
+            rules: formatRules
+          }
+        }]
+      }
+    });
+  }
+
+  async getSheetId(spreadsheetId, sheetName) {
+    const response = await sheets.spreadsheets.get({
+      spreadsheetId,
+      fields: 'sheets.properties'
+    });
+
+    const sheet = response.data.sheets.find(s => s.properties.title === sheetName);
+    return sheet ? sheet.properties.sheetId : null;
+  }
+
+  async getSheetData(spreadsheetId, sheetName) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: sheetName
+    });
+    return response.data.values;
+  }
 }
 
 module.exports = SpreadsheetService;
