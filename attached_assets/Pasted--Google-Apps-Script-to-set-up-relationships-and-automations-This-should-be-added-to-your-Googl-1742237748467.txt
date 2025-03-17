@@ -1,0 +1,497 @@
+// Google Apps Script to set up relationships and automations
+// This should be added to your Google Sheet as a script
+
+/**
+ * Creates relationships between order data and ensures progress bars are consistent
+ */
+function setupFramingDatabaseRelationships() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) {
+      throw new Error("Could not access the active spreadsheet.");
+    }
+    
+    // Get the active sheet (the one you're currently viewing)
+    const activeSheet = ss.getActiveSheet();
+    if (!activeSheet) {
+      throw new Error("Could not access the active sheet.");
+    }
+    
+    // Use the active sheet as our main calendar sheet
+    const calendarSheet = activeSheet;
+    Logger.log("Using sheet: " + calendarSheet.getName() + " as the main Calendar sheet");
+    
+    // Create reference tables if they don't exist yet
+    ensureReferenceTablesExist(ss);
+    
+    // Set up formulas for linking order IDs across tables
+    linkOrdersAcrossTables(ss, calendarSheet);
+    
+    // Ensure progress bars are consistent and use the moulding table's progress
+    standardizeProgressBars(ss);
+    
+    // Add data validation and conditional formatting
+    setupDataValidationAndFormatting(ss);
+    
+    // Success message
+    SpreadsheetApp.getUi().alert("Setup completed successfully!");
+    
+  } catch (error) {
+    // Show error to user
+    SpreadsheetApp.getUi().alert("Error: " + error.message);
+    Logger.log("Error: " + error.message);
+    Logger.log("Stack: " + error.stack);
+  }
+}
+
+/**
+ * Creates necessary reference tables for the custom framing system
+ */
+function ensureReferenceTablesExist(ss) {
+  // Check for and create if needed: Moulding, Mat, Fabric, Glass tables
+  const requiredTables = ['Moulding', 'Mat', 'Fabric', 'Glass'];
+  const existingSheets = ss.getSheets().map(sheet => sheet.getName());
+  
+  requiredTables.forEach(tableName => {
+    if (!existingSheets.includes(tableName)) {
+      const newSheet = ss.insertSheet(tableName);
+      
+      // Setup headers for each table
+      const headers = ['Order ID', 'Description', 'Material ID', 'Quantity', 'Status', 'Progress Bar', 'Notes'];
+      newSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      
+      // Format header row
+      newSheet.getRange(1, 1, 1, headers.length)
+        .setBackground('#4285F4')
+        .setFontColor('white')
+        .setFontWeight('bold');
+      
+      // Freeze header row
+      newSheet.setFrozenRows(1);
+      
+      Logger.log("Created new sheet: " + tableName);
+    }
+  });
+  
+  // Create a central lookup table for all orders
+  if (!existingSheets.includes('OrderLookup')) {
+    const lookupSheet = ss.insertSheet('OrderLookup');
+    const lookupHeaders = ['Order ID', 'Customer Name', 'Description', 
+                          'Moulding ID', 'Mat ID', 'Fabric ID', 'Glass ID', 
+                          'Progress', 'Status', 'Due Date'];
+    
+    lookupSheet.getRange(1, 1, 1, lookupHeaders.length).setValues([lookupHeaders]);
+    lookupSheet.getRange(1, 1, 1, lookupHeaders.length)
+      .setBackground('#4285F4')
+      .setFontColor('white')
+      .setFontWeight('bold');
+    lookupSheet.setFrozenRows(1);
+    
+    Logger.log("Created OrderLookup sheet");
+  }
+}
+
+/**
+ * Creates formulas to link order IDs across all tables
+ */
+function linkOrdersAcrossTables(ss, calendarSheet) {
+  try {
+    // First, check if the calendar sheet has data
+    if (calendarSheet.getLastRow() < 1) {
+      throw new Error("Calendar sheet appears to be empty");
+    }
+    
+    const orderLookupSheet = ss.getSheetByName('OrderLookup');
+    if (!orderLookupSheet) {
+      throw new Error("OrderLookup sheet not found");
+    }
+    
+    // First, populate the OrderLookup table from the Calendar
+    const calendarData = calendarSheet.getDataRange().getValues();
+    if (!calendarData || calendarData.length < 1) {
+      throw new Error("Could not get data from Calendar sheet");
+    }
+    
+    const headers = calendarData[0];
+    Logger.log("Headers in calendar sheet: " + JSON.stringify(headers));
+    
+    // Find column indices in Calendar sheet
+    const orderIdColIndex = headers.indexOf('Order ID');
+    const nameColIndex = headers.indexOf('Name');
+    const descColIndex = headers.indexOf('Description');
+    const mouldingIdColIndex = headers.indexOf('Moulding ID');
+    const matIdColIndex = headers.indexOf('Mat ID');
+    const fabricIdColIndex = headers.indexOf('Fabric ID');
+    const progressColIndex = headers.indexOf('Order Progress');
+    const dueDateColIndex = headers.indexOf('Date Due');
+    
+    // Check if we found the essential columns
+    if (orderIdColIndex === -1) {
+      throw new Error("'Order ID' column not found in the sheet");
+    }
+    
+    // Populate OrderLookup table with data from Calendar
+    // For safety, we'll use direct values first instead of formulas
+    let lookupData = [];
+    
+    // First row is headers
+    lookupData.push([
+      'Order ID', 'Customer Name', 'Description', 
+      'Moulding ID', 'Mat ID', 'Fabric ID', 'Glass ID', 
+      'Progress', 'Status', 'Due Date'
+    ]);
+    
+    // Add data rows from Calendar
+    for (let i = 1; i < calendarData.length; i++) {
+      const row = calendarData[i];
+      const orderId = row[orderIdColIndex];
+      
+      if (orderId) {
+        const lookupRow = [
+          orderId,
+          nameColIndex > -1 ? row[nameColIndex] : '',
+          descColIndex > -1 ? row[descColIndex] : '',
+          mouldingIdColIndex > -1 ? row[mouldingIdColIndex] : '',
+          matIdColIndex > -1 ? row[matIdColIndex] : '',
+          fabricIdColIndex > -1 ? row[fabricIdColIndex] : '',
+          '', // Glass ID (will be added later)
+          progressColIndex > -1 ? row[progressColIndex] : '',
+          '', // Status placeholder
+          dueDateColIndex > -1 ? row[dueDateColIndex] : ''
+        ];
+        
+        lookupData.push(lookupRow);
+      }
+    }
+    
+    // Clear existing data and add new data
+    orderLookupSheet.clearContents();
+    if (lookupData.length > 0) {
+      orderLookupSheet.getRange(1, 1, lookupData.length, lookupData[0].length).setValues(lookupData);
+      Logger.log("Added " + (lookupData.length - 1) + " rows to OrderLookup");
+    }
+    
+    // Now, populate the material tables with references to their respective orders
+    populateMaterialTables(ss, lookupData);
+    
+  } catch (error) {
+    throw new Error("Error in linkOrdersAcrossTables: " + error.message);
+  }
+}
+
+/**
+ * Populates the material tables (Moulding, Mat, Fabric, Glass) with order references
+ */
+function populateMaterialTables(ss, lookupData) {
+  try {
+    if (!lookupData || lookupData.length <= 1) {
+      Logger.log("No data to populate material tables");
+      return;
+    }
+    
+    // Setup each material table
+    const materialTables = ['Moulding', 'Mat', 'Fabric', 'Glass'];
+    const materialIdColumns = [4, 5, 6, 7]; // Indices in lookupData for each material ID
+    
+    materialTables.forEach((tableName, index) => {
+      Logger.log("Setting up " + tableName + " table");
+      
+      const materialSheet = ss.getSheetByName(tableName);
+      if (!materialSheet) {
+        Logger.log("Sheet " + tableName + " not found");
+        return;
+      }
+      
+      const materialIdColumn = materialIdColumns[index];
+      
+      // Clear existing data but keep headers
+      materialSheet.clearContents();
+      
+      // Create headers
+      materialSheet.getRange(1, 1, 1, 7).setValues([
+        ['Order ID', 'Description', 'Material ID', 'Quantity', 'Status', 'Progress Bar', 'Notes']
+      ]);
+      
+      // Add data from lookup table
+      let materialData = [];
+      
+      for (let i = 1; i < lookupData.length; i++) {
+        const row = lookupData[i];
+        const orderId = row[0]; // Order ID is first column
+        const materialId = row[materialIdColumn]; // Get Material ID
+        const description = row[2]; // Description is third column
+        const progress = row[7]; // Progress is eighth column
+        
+        if (orderId && materialId) {
+          materialData.push([
+            orderId,
+            description,
+            materialId,
+            1, // Default quantity
+            '', // Status placeholder
+            progress, // Progress from lookup
+            '' // Notes placeholder
+          ]);
+        }
+      }
+      
+      // Add data if we have any
+      if (materialData.length > 0) {
+        materialSheet.getRange(2, 1, materialData.length, materialData[0].length).setValues(materialData);
+        Logger.log("Added " + materialData.length + " rows to " + tableName);
+      }
+    });
+    
+  } catch (error) {
+    throw new Error("Error in populateMaterialTables: " + error.message);
+  }
+}
+
+/**
+ * Ensures all progress bars use the moulding table's progress bar
+ */
+function standardizeProgressBars(ss) {
+  try {
+    const mouldingSheet = ss.getSheetByName('Moulding');
+    if (!mouldingSheet) {
+      Logger.log("Moulding sheet not found");
+      return;
+    }
+    
+    const mouldingData = mouldingSheet.getDataRange().getValues();
+    if (!mouldingData || mouldingData.length <= 1) {
+      Logger.log("No data in Moulding sheet");
+      return;
+    }
+    
+    const mouldingHeaders = mouldingData[0];
+    const mouldingOrderIdColIndex = mouldingHeaders.indexOf('Order ID');
+    const mouldingProgressColIndex = mouldingHeaders.indexOf('Progress Bar');
+    
+    if (mouldingOrderIdColIndex === -1 || mouldingProgressColIndex === -1) {
+      Logger.log("Required columns not found in Moulding sheet");
+      return;
+    }
+    
+    // Create a lookup of order ID to moulding progress
+    const progressByOrderId = {};
+    for (let i = 1; i < mouldingData.length; i++) {
+      const row = mouldingData[i];
+      const orderId = row[mouldingOrderIdColIndex];
+      const progress = row[mouldingProgressColIndex];
+      
+      if (orderId && progress) {
+        progressByOrderId[orderId] = progress;
+      }
+    }
+    
+    // Update all other material tables to use Moulding's progress
+    const materialTables = ['Mat', 'Fabric', 'Glass'];
+    
+    materialTables.forEach(tableName => {
+      const materialSheet = ss.getSheetByName(tableName);
+      if (!materialSheet) {
+        Logger.log(tableName + " sheet not found");
+        return;
+      }
+      
+      const materialData = materialSheet.getDataRange().getValues();
+      if (!materialData || materialData.length <= 1) {
+        Logger.log("No data in " + tableName + " sheet");
+        return;
+      }
+      
+      const materialHeaders = materialData[0];
+      const materialOrderIdColIndex = materialHeaders.indexOf('Order ID');
+      const materialProgressColIndex = materialHeaders.indexOf('Progress Bar');
+      
+      if (materialOrderIdColIndex === -1 || materialProgressColIndex === -1) {
+        Logger.log("Required columns not found in " + tableName + " sheet");
+        return;
+      }
+      
+      // Update progress values
+      for (let i = 1; i < materialData.length; i++) {
+        const row = materialData[i];
+        const orderId = row[materialOrderIdColIndex];
+        
+        if (orderId && progressByOrderId[orderId]) {
+          materialSheet.getRange(i + 1, materialProgressColIndex + 1).setValue(progressByOrderId[orderId]);
+        }
+      }
+      
+      Logger.log("Updated progress bars in " + tableName);
+    });
+    
+  } catch (error) {
+    Logger.log("Error in standardizeProgressBars: " + error.message);
+    // Non-critical function, so we'll just log and continue
+  }
+}
+
+/**
+ * Adds data validation and conditional formatting to sheets
+ */
+function setupDataValidationAndFormatting(ss) {
+  try {
+    // Set up progress bar dropdown in Moulding table
+    const mouldingSheet = ss.getSheetByName('Moulding');
+    if (!mouldingSheet) {
+      Logger.log("Moulding sheet not found");
+      return;
+    }
+    
+    const progressOptions = [
+      "░░░░░░░░░░ 0%",
+      "█░░░░░░░░░ 10%",
+      "██░░░░░░░░ 20%",
+      "███░░░░░░░ 30%",
+      "████░░░░░░ 40%",
+      "█████░░░░░ 50%",
+      "██████░░░░ 60%",
+      "███████░░░ 70%",
+      "████████░░ 80%",
+      "█████████░ 90%",
+      "██████████ 100%"
+    ];
+    
+    // Find the progress column
+    const mouldingHeaders = mouldingSheet.getRange(1, 1, 1, mouldingSheet.getLastColumn()).getValues()[0];
+    const progressColIndex = mouldingHeaders.indexOf('Progress Bar');
+    
+    if (progressColIndex === -1) {
+      Logger.log("Progress Bar column not found in Moulding sheet");
+      return;
+    }
+    
+    // Create data validation rule for progress bars
+    const progressRule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(progressOptions, true)
+      .build();
+    
+    // Apply to Moulding progress column
+    const progressCol = progressColIndex + 1;
+    if (mouldingSheet.getLastRow() > 1) {
+      mouldingSheet.getRange(2, progressCol, mouldingSheet.getLastRow() - 1, 1).setDataValidation(progressRule);
+    }
+    
+    Logger.log("Added data validation to Moulding progress column");
+    
+    // Simplified conditional formatting
+    try {
+      const sheets = ['OrderLookup', 'Moulding', 'Mat', 'Fabric', 'Glass'];
+      
+      sheets.forEach(sheetName => {
+        const sheet = ss.getSheetByName(sheetName);
+        if (!sheet) {
+          Logger.log(sheetName + " sheet not found");
+          return;
+        }
+        
+        // Find progress column
+        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+        let progressIndex = headers.indexOf('Progress Bar');
+        if (progressIndex === -1) {
+          progressIndex = headers.indexOf('Progress');
+        }
+        
+        if (progressIndex === -1) {
+          Logger.log("Progress column not found in " + sheetName);
+          return;
+        }
+        
+        const progressCol = progressIndex + 1;
+        
+        // Simple red/yellow/green formatting based on text content
+        const rules = [];
+        
+        // 0-30% - Red
+        rules.push(SpreadsheetApp.newConditionalFormatRule()
+          .whenTextContains("0%")
+          .setBackground("#F4C7C3")
+          .setRanges([sheet.getRange(2, progressCol, Math.max(1, sheet.getLastRow() - 1), 1)])
+          .build());
+        
+        // 40-70% - Yellow
+        rules.push(SpreadsheetApp.newConditionalFormatRule()
+          .whenTextContains("50%")
+          .setBackground("#FCE8B2")
+          .setRanges([sheet.getRange(2, progressCol, Math.max(1, sheet.getLastRow() - 1), 1)])
+          .build());
+        
+        // 80-100% - Green
+        rules.push(SpreadsheetApp.newConditionalFormatRule()
+          .whenTextContains("100%")
+          .setBackground("#B7E1CD")
+          .setRanges([sheet.getRange(2, progressCol, Math.max(1, sheet.getLastRow() - 1), 1)])
+          .build());
+        
+        sheet.setConditionalFormatRules(rules);
+        Logger.log("Added conditional formatting to " + sheetName);
+      });
+    } catch (formattingError) {
+      Logger.log("Error setting up conditional formatting: " + formattingError.message);
+      // Non-critical, continue execution
+    }
+    
+  } catch (error) {
+    Logger.log("Error in setupDataValidationAndFormatting: " + error.message);
+    // Non-critical function, so we'll just log and continue
+  }
+}
+
+/**
+ * Creates a simplified AppSheet UX patterns sheet
+ * This function is standalone and doesn't depend on other functions
+ */
+function setupAppSheetUXPatterns() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Create AppSheet UX Patterns sheet if it doesn't exist
+    let uxSheet;
+    try {
+      uxSheet = ss.getSheetByName('AppSheetUX');
+      if (uxSheet) {
+        // Sheet already exists, clear it
+        uxSheet.clear();
+      } else {
+        // Create new sheet
+        uxSheet = ss.insertSheet('AppSheetUX');
+      }
+    } catch (error) {
+      Logger.log("Error creating/clearing AppSheetUX sheet: " + error.message);
+      uxSheet = ss.insertSheet('AppSheetUX');
+    }
+    
+    // Define headers
+    const headers = ['Pattern Type', 'Component', 'Description', 'Formula/Setting'];
+    uxSheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+    
+    // Define UX patterns
+    const patterns = [
+      ['View', 'Orders Dashboard', 'Main view showing all orders', 'Table: OrderLookup, Grouped by Status'],
+      ['Slice', 'Active Orders', 'Only show active orders', 'WHERE [Active] = "Yes"'],
+      ['Slice', 'Completed Orders', 'Only show completed orders', 'WHERE [Progress] = "██████████ 100%"'],
+      ['Format', 'Progress Color', 'Color-code progress bars', 'FORMAT_COND([Progress], "100%", "Green", "0%", "Red", "Yellow")'],
+      ['Action', 'Update Progress', 'Update order progress', 'Target: Moulding, Action: Edit, Column: Progress Bar'],
+      ['Workflow', 'Due Date Alert', 'Notify when due date approaches', 'WHEN [Date Due] < TODAY()+3 THEN SendEmail()'],
+      ['Ref Sync', 'Material Updates', 'Sync material changes', 'Auto-sync when Moulding data changes'],
+      ['Form', 'New Order', 'Form to create a new order', 'Required fields: Name, Description, Date Due'],
+      ['Chart', 'Progress Overview', 'Chart showing completion status', 'Group by Progress, Count of Order ID'],
+      ['Calendar', 'Production Schedule', 'Calendar of due dates', 'Date field: Date Due, Event title: Description']
+    ];
+    
+    // Add patterns to the sheet
+    uxSheet.getRange(2, 1, patterns.length, patterns[0].length).setValues(patterns);
+    
+    // Format the sheet
+    uxSheet.autoResizeColumns();
+    
+    SpreadsheetApp.getUi().alert("AppSheet UX patterns have been created successfully!");
+    
+  } catch (error) {
+    SpreadsheetApp.getUi().alert("Error: " + error.message);
+    Logger.log("Error in setupAppSheetUXPatterns: " + error.message);
+  }
+}
