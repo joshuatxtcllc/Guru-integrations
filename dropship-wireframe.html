@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frame Guru - Vendor Integration Wireframe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .wireframe-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .wireframe {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+            padding: 20px;
+        }
+        .wireframe-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .wireframe-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3a5a40;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 14px;
+        }
+        .table th {
+            background-color: #f5f5f5;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-space-between {
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Frame Guru - Vendor Integration Wireframes</h1>
+            <p>Wireframes for dropshipping integration with Frame Destination and Frame It Easy</p>
+        </div>
+        
+        <div class="wireframe-container">
+            <!-- Customer Order Flow -->
+            <div class="section">
+                <div class="section-title">Customer Experience - No Visible Change</div>
+                <div class="wireframe">
+                    <div class="wireframe-title">Customer Order Process</div>
+                    <div class="wireframe-description">
+                        The customer experience remains unchanged. Customers will not know if their order is fulfilled in-house or by a vendor partner.
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-title">Standard Frame Order Process</div>
+                        <ol>
+                            <li>Customer selects frame style, size, and options on Frame Guru website</li>
+                            <li>Customer uploads artwork or selects to ship artwork separately</li>
+                            <li>Customer completes checkout and receives order confirmation</li>
+                            <li>Customer receives Frame Guru branded shipping confirmation</li>
+                            <li>Customer receives Frame Guru branded packaging (drop-shipped by vendor)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Order Management -->
+            <div class="section">
+                <div class="section-title">Admin Order Management Interface</div>
+                <div class="wireframe">
+                    <div class="wireframe-title">Order Dashboard</div>
+                    <div class="wireframe-description">
+                        Admin interface for managing orders and vendor fulfillment
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-title">Order List</div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search orders...">
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Fulfillment</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1001</td>
+                                    <td>2025-03-15</td>
+                                    <td>John Smith</td>
+                                    <td>$149.99</td>
+                                    <td><span class="status status-processing">Processing</span></td>
+                                    <td><strong>Frame Destination</strong></td>
+                                    <td><button class="btn btn-secondary">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>1002</td>
+                                    <td>2025-03-16</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>$89.99</td>
+                                    <td><span class="status status-pending">Pending</span></td>
+                                    <td><strong>Frame It Easy</strong></td>
+                                    <td><button class="btn btn-secondary">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>1003</td>
+                                    <td>2025-03-16</td>
+                                    <td>David Williams</td>
+                                    <td>$299.99</td>
+                                    <td><span class="status status-pending">Pending</span></td>
+                                    <td><strong>In-House (Tier 3)</strong></td>
+                                    <td><button class="btn btn-secondary">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="wireframe" style="margin-top: 20px;">
+                    <div class="wireframe-title">Order Detail with Vendor Integration</div>
+                    
+                    <div class="grid">
+                        <div class="panel">
+                            <div class="panel-title">Order Information</div>
+                            <div class="form-group">
+                                <label>Order #:</label>
+                                <div>1001</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Date:</label>
+                                <div>March 15, 2025</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Customer:</label>
+                                <div>John Smith (john@example.com)</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Status:</label>
+                                <div><span class="status status-processing">Processing</span></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Fulfillment Method:</label>
+                                <div>
+                                    <select class="form-control">
+                                        <option selected>Frame Destination</option>
+                                        <option>Frame It Easy</option>
+                                        <option>In-House</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Vendor Order #:</label>
+                                <div>FD-98765</div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel">
+                            <div class="panel-title">Order Items</div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Details</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Classic Wood Frame</td>
+                                        <td>16×20", Walnut Finish</td>
+                                        <td>$79.99</td>
+                                    </tr>
+                                    <tr>
+                                        <td>UV Glass Upgrade</td>
+                                        <td>16×20"</td>
+                                        <td>$40.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mat Board</td>
+                                        <td>White, 2" border</td>
+                                        <td>$20.00</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2"><strong>Total</strong></td>
+                                        <td><strong>$149.99</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="panel" style="margin-top: 20px;">
+                        <div class="panel-title">Vendor Integration Controls</div>
+                        
+                        <div class="grid">
+                            <div>
+                                <div class="form-group">
+                                    <label>Vendor Status:</label>
+                                    <div><span class="status status-processing">In Production</span></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Updated:</label>
+                                    <div>March 16, 2025, 10:32 AM</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Expected Ship Date:</label>
+                                    <div>March 18, 2025</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="form-group">
+                                    <label>Actions:</label>
+                                    <div>
+                                        <button class="btn">Refresh Status</button>
+                                        <button class="btn">Re-transmit Order</button>
+                                        <button class="btn btn-secondary">Cancel Order</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Order Data Transmission:</label>
+                                    <div><span class="status status-success">Successfully Transmitted</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vendor Configuration -->
+            <div class="section">
+                <div class="section-title">Vendor Configuration Interface</div>
+                <div class="wireframe">
+                    <div class="wireframe-title">Vendor Settings</div>
+                    
+                    <div class="grid">
+                        <div class="panel">
+                            <div class="panel-title">Frame Destination</div>
+                            <div class="form-group">
+                                <label>API Endpoint:</label>
+                                <input type="text" class="form-control" value="https://api.framedestination.com/v2/">
+                            </div>
+                            <div class="form-group">
+                                <label>API Key:</label>
+                                <input type="password" class="form-control" value="••••••••••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>Default Account:</label>
+                                <input type="text" class="form-control" value="frameguru_wholesale">
+                            </div>
+                            <div class="form-group">
+                                <label>Status:</label>
+                                <select class="form-control">
+                                    <option selected>Active</option>
+                                    <option>Inactive</option>
+                                    <option>Test Mode</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred for:</label>
+                                <div>
+                                    <label><input type="checkbox" checked> Wood Frames</label><br>
+                                    <label><input type="checkbox" checked> Shadowboxes</label><br>
+                                    <label><input type="checkbox"> Metal Frames</label><br>
+                                    <label><input type="checkbox" checked> Premium Glass</label>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn">Test Connection</button>
+                                <button class="btn">Save Settings</button>
+                            </div>
+                        </div>
+                        
+                        <div class="panel">
+                            <div class="panel-title">Frame It Easy</div>
+                            <div class="form-group">
+                                <label>API Endpoint:</label>
+                                <input type="text" class="form-control" value="https://api.frameiteasy.com/partners/">
+                            </div>
+                            <div class="form-group">
+                                <label>API Key:</label>
+                                <input type="password" class="form-control" value="••••••••••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>Partner ID:</label>
+                                <input type="text" class="form-control" value="frameguru2025">
+                            </div>
+                            <div class="form-group">
+                                <label>Status:</label>
+                                <select class="form-control">
+                                    <option selected>Active</option>
+                                    <option>Inactive</option>
+                                    <option>Test Mode</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred for:</label>
+                                <div>
+                                    <label><input type="checkbox"> Wood Frames</label><br>
+                                    <label><input type="checkbox"> Shadowboxes</label><br>
+                                    <label><input type="checkbox" checked> Metal Frames</label><br>
+                                    <label><input type="checkbox" checked> Standard Mat Frames</label>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn">Test Connection</button>
+                                <button class="btn">Save Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wireframe" style="margin-top: 20px;">
+                    <div class="wireframe-title">Product Mapping</div>
+                    
+                    <div class="panel">
+                        <div class="panel-title">Frame Style Mapping</div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Frame Guru Style</th>
+                                    <th>Frame Destination SKU</th>
+                                    <th>Frame It Easy SKU</th>
+                                    <th>Preferred Vendor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Classic Wood (Walnut)</td>
+                                    <td>FD-WD-CL-WAL</td>
+                                    <td>FIE-WD-201-W</td>
+                                    <td>
+                                        <select class="form-control">
+                                            <option selected>Frame Destination</option>
+                                            <option>Frame It Easy</option>
+                                            <option>Either (Price Compare)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Modern Metal (Black)</td>
+                                    <td>FD-MT-MOD-BLK</td>
+                                    <td>FIE-MT-105-B</td>
+                                    <td>
+                                        <select class="form-control">
+                                            <option>Frame Destination</option>
+                                            <option selected>Frame It Easy</option>
+                                            <option>Either (Price Compare)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Floating Frame (Natural)</td>
+                                    <td>FD-FL-NAT</td>
+                                    <td>N/A</td>
+                                    <td>
+                                        <select class="form-control">
+                                            <option selected>Frame Destination</option>
+                                            <option disabled>Frame It Easy</option>
+                                            <option>Either (Price Compare)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="flex flex-space-between" style="margin-top: 15px;">
+                            <button class="btn">Add Mapping</button>
+                            <button class="btn">Save All Mappings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reporting Interface -->
+            <div class="section">
+                <div class="section-title">Vendor Performance Dashboard</div>
+                <div class="wireframe">
+                    <div class="wireframe-title">Vendor Analytics</div>
+                    
+                    <div class="grid">
+                        <div class="panel">
+                            <div class="panel-title">Order Distribution</div>
+                            <div style="height: 200px; background-color: #eee; display: flex; align-items: center; justify-content: center;">
+                                [Pie Chart: Orders by Fulfillment Method]
+                            </div>
+                            <div style="font-size: 14px; margin-top: 10px;">
+                                <div><strong>Frame Destination:</strong> 145 orders (45%)</div>
+                                <div><strong>Frame It Easy:</strong> 102 orders (32%)</div>
+                                <div><strong>In-House:</strong> 74 orders (23%)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel">
+                            <div class="panel-title">Fulfillment Performance</div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Vendor</th>
+                                        <th>Avg. Turnaround</th>
+                                        <th>On-Time %</th>
+                                        <th>Quality Issues</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Frame Destination</td>
+                                        <td>4.2 days</td>
+                                        <td>96.5%</td>
+                                        <td>1.2%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Frame It Easy</td>
+                                        <td>3.8 days</td>
+                                        <td>98.1%</td>
+                                        <td>0.9%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>In-House</td>
+                                        <td>7.5 days</td>
+                                        <td>91.2%</td>
+                                        <td>0.5%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="panel" style="margin-top: 20px;">
+                        <div class="panel-title">Cost Analysis</div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product Category</th>
+                                    <th>In-House Cost</th>
+                                    <th>Frame Destination</th>
+                                    <th>Frame It Easy</th>
+                                    <th>Best Option</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>8×10" Wood Frame</td>
+                                    <td>$32.50</td>
+                                    <td>$28.75</td>
+                                    <td>$29.99</td>
+                                    <td><strong>Frame Destination</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>11×14" Metal Frame</td>
+                                    <td>$39.25</td>
+                                    <td>$38.50</td>
+                                    <td>$35.40</td>
+                                    <td><strong>Frame It Easy</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>16×20" Shadowbox</td>
+                                    <td>$65.75</td>
+                                    <td>$58.25</td>
+                                    <td>$67.00</td>
+                                    <td><strong>Frame Destination</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Custom Tier 3</td>
+                                    <td>$125.00</td>
+                                    <td>$145.00</td>
+                                    <td>N/A</td>
+                                    <td><strong>In-House</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
