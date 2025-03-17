@@ -1,0 +1,158 @@
+# Guide to Setting Up The Frame Guru Website
+
+This guide provides step-by-step instructions for setting up The Frame Guru website using GitHub, Replit, and Netlify.
+
+## GitHub Setup
+
+### 1. Create a New Repository
+
+1. Log in to your GitHub account.
+2. Click the "+" icon in the top-right corner and select "New repository".
+3. Name your repository (e.g., "frame-guru-website").
+4. Add a description: "Website for The Frame Guru framing business".
+5. Choose "Public" or "Private" visibility.
+6. Check "Add a README file".
+7. Click "Create repository".
+
+### 2. Upload Initial Files
+
+1. Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/yourusername/frame-guru-website.git
+   cd frame-guru-website
+   ```
+
+2. Create the basic file structure:
+   ```
+   mkdir -p assets/css assets/js assets/images
+   touch index.html about.html services.html gallery.html contact.html
+   touch assets/css/styles.css assets/css/normalize.css
+   touch assets/js/main.js
+   mkdir wireframes
+   ```
+
+3. Copy the content from the provided files into your local files.
+
+4. Commit and push your changes:
+   ```bash
+   git add .
+   git commit -m "Initial website setup with basic HTML structure"
+   git push origin main
+   ```
+
+## Replit Setup
+
+### 1. Create a New Repl
+
+1. Go to [Replit](https://replit.com/) and log in.
+2. Click "Create" to create a new Repl.
+3. Select "HTML, CSS, JS" as the template.
+4. Name your Repl (e.g., "frame-guru-website").
+5. Click "Create Repl".
+
+### 2. Import from GitHub
+
+1. In your new Repl, click on the "Version Control" icon in the sidebar.
+2. Click "Connect to GitHub".
+3. Authorize Replit to access your GitHub account if prompted.
+4. Select your "frame-guru-website" repository.
+5. Click "Import from GitHub".
+
+### 3. Work with Replit
+
+- Your files will now be imported from GitHub.
+- You can edit files directly in the Replit editor.
+- The site will automatically be previewed in the Replit browser.
+- Changes you make in Replit can be committed and pushed back to GitHub:
+  ```
+  git add .
+  git commit -m "Updated via Replit"
+  git push
+  ```
+
+## Netlify Setup
+
+### 1. Deploy from GitHub
+
+1. Go to [Netlify](https://www.netlify.com/) and log in.
+2. Click "New site from Git".
+3. Select "GitHub" as your Git provider.
+4. Authorize Netlify to access your GitHub account if prompted.
+5. Select your "frame-guru-website" repository.
+
+### 2. Configure Build Settings
+
+1. Configure your build settings:
+   - Build command: (Leave empty for static HTML site)
+   - Publish directory: (Leave empty to use root directory)
+2. Click "Deploy site".
+
+### 3. Set Up Custom Domain (Optional)
+
+1. Once your site is deployed, go to "Site settings" > "Domain management".
+2. Click "Add custom domain".
+3. Enter your domain (e.g., theframeguru.com).
+4. Follow the steps to verify domain ownership and configure DNS settings.
+
+## Continuous Integration Workflow
+
+With this setup, you've created a powerful continuous integration workflow:
+
+1. **Development Process**:
+   - Write and test code locally or in Replit
+   - Commit changes to GitHub
+   - Netlify automatically deploys when changes are pushed to the main branch
+
+2. **Collaboration Features**:
+   - Multiple team members can work on the site by cloning the GitHub repository
+   - Use branches for developing new features without affecting the live site
+   - Create pull requests for code review before merging changes
+
+3. **Maintenance Workflow**:
+   - Make changes through GitHub's web interface for quick updates
+   - Use Replit for more complex edits with instant preview
+   - Monitor site performance and deployments through Netlify's dashboard
+
+## Additional Development Tips
+
+### CSS Structure
+
+For the website styling, consider using the following structure in your CSS files:
+
+1. **normalize.css**: Reset browser defaults
+2. **styles.css**: Main stylesheet organized as follows:
+   - Variables (colors, fonts, spacing)
+   - Global styles
+   - Layout components (header, footer, grid system)
+   - Section-specific styles
+   - Utility classes
+   - Media queries for responsive design
+
+### JavaScript Functionality
+
+The `main.js` file should handle:
+
+1. Mobile navigation toggle
+2. Form validation for contact and order forms
+3. Image gallery functionality
+4. Optional: Simple animations for page elements
+
+### Future Enhancements
+
+As your business grows, consider adding:
+
+1. E-commerce functionality using a platform like Shopify or WooCommerce
+2. Integration with a CMS like Contentful for easier content updates
+3. Customer account system for order tracking
+4. Appointment scheduling system for consultations
+
+## Regular Maintenance
+
+Once your site is live:
+
+1. Regularly update content (events, gallery, prices)
+2. Check all links and forms monthly
+3. Update testimonials with recent customer feedback
+4. Refresh gallery images quarterly to showcase new work
+
+This complete setup gives you a professional web presence for The Frame Guru with flexibility for future growth and easy maintenance.
