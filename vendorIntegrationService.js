@@ -97,31 +97,44 @@ async function determineVendor(order) {
       vendorScores['frame-it-easy'] = -10;
     }
     
-    // Determine best vendor based on scores
-    let bestVendor = 'in-house';
-    let highestScore = vendorScores['in-house'];
+    // Determine best vendor based on scores and availability
+    const vendorRanking = Object.entries(vendorScores)
+      .filter(([vendor]) => {
+        if (vendor === 'in-house') return true;
+        const vendorConfig = vendors[vendor.replace('-', '')];
+        return vendorConfig && vendorConfig.active;
+      })
+      .sort(([,a], [,b]) => b - a);
+
+    const [bestVendor, highestScore] = vendorRanking[0];
     
-    if (vendorScores['frame-destination'] > highestScore) {
-      bestVendor = 'frame-destination';
-      highestScore = vendorScores['frame-destination'];
-    }
-    
-    if (vendorScores['frame-it-easy'] > highestScore) {
-      bestVendor = 'frame-it-easy';
-      highestScore = vendorScores['frame-it-easy'];
-    }
-    
+    // Log vendor selection for monitoring
+    await logActivity({
+      type: 'VENDOR_SELECTION',
+      details: {
+        selectedVendor: bestVendor,
+        scores: vendorScores,
+        ranking: vendorRanking
+      }
+    });
+
     return {
       vendor: bestVendor,
       scores: vendorScores,
+      ranking: vendorRanking,
       reason: `Selected based on product compatibility and vendor availability (Score: ${highestScore})`
     };
   } catch (error) {
     console.error('Error determining vendor:', error);
-    // Default to in-house on error
+    await logActivity({
+      type: 'VENDOR_SELECTION_ERROR',
+      details: { error: error.message }
+    });
+    
     return {
       vendor: 'in-house',
-      reason: 'Error in vendor determination process, defaulting to in-house'
+      reason: 'Error in vendor determination process, defaulting to in-house',
+      error: error.message
     };
   }
 }
