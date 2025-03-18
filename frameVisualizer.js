@@ -4,9 +4,11 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; // kept for potential future use
+//import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'; // kept for potential future use
+import { TextureLoader } from 'three';
+
 
 class FrameVisualizer {
   constructor(container, options = {}) {
@@ -62,39 +64,36 @@ class FrameVisualizer {
       gallery: { model: 'gallery_frame.glb', profile: { width: 1, depth: 1.25 } }
     };
 
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(this.options.backgroundColor);
+    this.camera = new THREE.PerspectiveCamera(75, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.frameGroup = new THREE.Group();
+    this.textureLoader = new THREE.TextureLoader();
+    //this.gltfLoader = new GLTFLoader(); // kept for potential future use
+
     this.init();
   }
 
   init() {
-    // Create scene
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(this.options.backgroundColor);
-
-    // Set up camera
-    this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
-    this.camera.position.z = 30;
-
-    // Set up renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // Setup renderer
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.shadowMap.enabled = true;
     this.container.appendChild(this.renderer.domElement);
 
-    // Add controls
+    // Setup camera
+    this.camera.position.z = 5;
+
+    // Setup lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(5, 5, 5);
+
+    this.scene.add(ambientLight);
+    this.scene.add(pointLight);
+    this.scene.add(this.frameGroup);
+
+    // Setup controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-    this.controls.minDistance = 15;
-    this.controls.maxDistance = 50;
-    this.controls.maxPolarAngle = Math.PI / 2;
-
-    // Add lights
-    this.setupLighting();
-
-    // Initialize loaders
-    this.textureLoader = new THREE.TextureLoader();
-    this.gltfLoader = new GLTFLoader();
 
     // Add window resize handler
     window.addEventListener('resize', this.onResize.bind(this));
@@ -106,42 +105,18 @@ class FrameVisualizer {
     this.animate();
   }
 
-  setupLighting() {
-    // Ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    this.scene.add(ambientLight);
-
-    // Main directional light (simulates window light)
-    const mainLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    mainLight.position.set(10, 10, 10);
-    mainLight.castShadow = true;
-    mainLight.shadow.mapSize.width = 2048;
-    mainLight.shadow.mapSize.height = 2048;
-    this.scene.add(mainLight);
-
-    // Fill light from opposite side
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight.position.set(-10, 5, -10);
-    this.scene.add(fillLight);
-
-    // Subtle rim light
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.2);
-    rimLight.position.set(0, -10, -10);
-    this.scene.add(rimLight);
-  }
-
   onResize() {
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-    
+
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    
+
     this.renderer.setSize(width, height);
   }
 
   animate() {
-    requestAnimationFrame(this.animate.bind(this));
+    requestAnimationFrame(() => this.animate());
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
@@ -158,7 +133,7 @@ class FrameVisualizer {
 
     // Get current dimensions
     const { width, height } = this.sizeDimensions[this.currentConfig.size];
-    
+
     // Scale factor for 3D space
     const scale = 1;
     const scaledWidth = width * scale;
@@ -193,10 +168,10 @@ class FrameVisualizer {
     // Frame dimensions
     const outerWidth = width + frameWidth * 2;
     const outerHeight = height + frameWidth * 2;
-    
+
     // Create outer frame
     this.createOuterFrame(outerWidth, outerHeight, frameWidth, frameDepth);
-    
+
     // Add artwork if available
     if (this.currentConfig.artwork) {
       this.addArtwork(width, height, 0);
@@ -211,22 +186,22 @@ class FrameVisualizer {
     const frameProfile = this.frameStyles[this.currentConfig.frameStyle].profile;
     const frameWidth = frameProfile.width;
     const frameDepth = frameProfile.depth;
-    
+
     // Mat width (standard 2-inch mat)
     const matWidth = 2;
-    
+
     // Dimensions
     const artworkWidth = width - matWidth * 2;
     const artworkHeight = height - matWidth * 2;
     const outerWidth = width + frameWidth * 2;
     const outerHeight = height + frameWidth * 2;
-    
+
     // Create outer frame
     this.createOuterFrame(outerWidth, outerHeight, frameWidth, frameDepth);
-    
+
     // Create mat
     this.createMat(width, height, artworkWidth, artworkHeight, 0.05);
-    
+
     // Add artwork if available
     if (this.currentConfig.artwork) {
       this.addArtwork(artworkWidth, artworkHeight, 0.1);
@@ -241,18 +216,18 @@ class FrameVisualizer {
     const frameProfile = this.frameStyles[this.currentConfig.frameStyle].profile;
     const frameWidth = frameProfile.width;
     const frameDepth = frameProfile.depth;
-    
+
     // Dimensions
     const outerWidth = width + frameWidth * 2;
     const outerHeight = height + frameWidth * 2;
     const shadowboxDepth = 1; // 1-inch deep shadowbox
-    
+
     // Create outer frame with extra depth
     this.createOuterFrame(outerWidth, outerHeight, frameWidth, frameDepth + shadowboxDepth);
-    
+
     // Create shadowbox interior
     this.createShadowboxInterior(width, height, shadowboxDepth);
-    
+
     // Add artwork if available
     if (this.currentConfig.artwork) {
       // Float artwork above shadowbox back
@@ -261,7 +236,7 @@ class FrameVisualizer {
       // Placeholder
       this.addPlaceholderArt(width * 0.9, height * 0.9, shadowboxDepth * 0.5);
     }
-    
+
     // If there's a custom object (for Tier 3 framing)
     if (this.currentConfig.customObject) {
       this.addCustomObject(shadowboxDepth);
@@ -271,28 +246,28 @@ class FrameVisualizer {
   createOuterFrame(outerWidth, outerHeight, frameWidth, frameDepth) {
     // Create basic frame geometry
     const frameGeometry = new THREE.BoxGeometry(outerWidth, outerHeight, frameDepth);
-    
+
     // Cut out the center
     const innerWidth = outerWidth - frameWidth * 2;
     const innerHeight = outerHeight - frameWidth * 2;
     const cutoutGeometry = new THREE.BoxGeometry(innerWidth, innerHeight, frameDepth + 0.1);
-    
+
     // Position the cutout
     cutoutGeometry.translate(0, 0, frameDepth * 0.05);
-    
+
     // Create frame material
     const frameMaterial = new THREE.MeshStandardMaterial({
       color: new THREE.Color(this.currentConfig.frameColor),
       roughness: 0.5,
       metalness: 0.2
     });
-    
+
     // Create mesh
     const frameMesh = new THREE.Mesh(frameGeometry, frameMaterial);
-    
+
     // Add to group
     this.frameGroup.add(frameMesh);
-    
+
     // Create glass
     const glassGeometry = new THREE.BoxGeometry(innerWidth - 0.05, innerHeight - 0.05, 0.05);
     const glassMaterial = new THREE.MeshPhysicalMaterial({
@@ -303,7 +278,7 @@ class FrameVisualizer {
       transmission: 0.95,
       ior: 1.5
     });
-    
+
     const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
     glassMesh.position.z = -frameDepth / 2 + 0.05;
     this.frameGroup.add(glassMesh);
@@ -312,42 +287,42 @@ class FrameVisualizer {
   createMat(width, height, artworkWidth, artworkHeight, depth) {
     // Mat board geometry
     const matGeometry = new THREE.BoxGeometry(width, height, depth);
-    
+
     // Cutout for artwork
     const cutoutGeometry = new THREE.BoxGeometry(artworkWidth + 0.1, artworkHeight + 0.1, depth + 0.1);
-    
+
     // Mat material
     const matMaterial = new THREE.MeshStandardMaterial({
       color: new THREE.Color(this.currentConfig.matColor),
       roughness: 0.9,
       metalness: 0
     });
-    
+
     // Create mesh
     const matMesh = new THREE.Mesh(matGeometry, matMaterial);
     matMesh.position.z = -0.1;
-    
+
     // Add to group
     this.frameGroup.add(matMesh);
-    
+
     // Second mat (if enabled)
     if (this.currentConfig.hasSecondMat) {
       const innerMatWidth = artworkWidth + 0.25;
       const innerMatHeight = artworkHeight + 0.25;
-      
+
       const innerMatGeometry = new THREE.BoxGeometry(innerMatWidth, innerMatHeight, depth);
-      
+
       const innerCutoutGeometry = new THREE.BoxGeometry(artworkWidth + 0.1, artworkHeight + 0.1, depth + 0.1);
-      
+
       const innerMatMaterial = new THREE.MeshStandardMaterial({
         color: new THREE.Color(this.currentConfig.secondMatColor),
         roughness: 0.9,
         metalness: 0
       });
-      
+
       const innerMatMesh = new THREE.Mesh(innerMatGeometry, innerMatMaterial);
       innerMatMesh.position.z = -0.05;
-      
+
       this.frameGroup.add(innerMatMesh);
     }
   }
@@ -359,35 +334,35 @@ class FrameVisualizer {
       roughness: 0.9,
       metalness: 0
     });
-    
+
     // Back panel
     const backGeometry = new THREE.BoxGeometry(width, height, 0.25);
     const backMesh = new THREE.Mesh(backGeometry, materialSides);
     backMesh.position.z = -depth;
     this.frameGroup.add(backMesh);
-    
+
     // Side panels (left, right, top, bottom)
     const sideWidthGeometry = new THREE.BoxGeometry(0.25, height, depth);
     const sideHeightGeometry = new THREE.BoxGeometry(width, 0.25, depth);
-    
+
     // Left side
     const leftMesh = new THREE.Mesh(sideWidthGeometry, materialSides);
     leftMesh.position.x = -width / 2;
     leftMesh.position.z = -depth / 2;
     this.frameGroup.add(leftMesh);
-    
+
     // Right side
     const rightMesh = new THREE.Mesh(sideWidthGeometry, materialSides);
     rightMesh.position.x = width / 2;
     rightMesh.position.z = -depth / 2;
     this.frameGroup.add(rightMesh);
-    
+
     // Top side
     const topMesh = new THREE.Mesh(sideHeightGeometry, materialSides);
     topMesh.position.y = height / 2;
     topMesh.position.z = -depth / 2;
     this.frameGroup.add(topMesh);
-    
+
     // Bottom side
     const bottomMesh = new THREE.Mesh(sideHeightGeometry, materialSides);
     bottomMesh.position.y = -height / 2;
@@ -398,14 +373,14 @@ class FrameVisualizer {
   addArtwork(width, height, zOffset) {
     // Create artwork plane
     const geometry = new THREE.PlaneGeometry(width, height);
-    
+
     // Load artwork texture
     this.textureLoader.load(this.currentConfig.artwork, (texture) => {
       const material = new THREE.MeshStandardMaterial({
         map: texture,
         roughness: 0.5
       });
-      
+
       const artworkMesh = new THREE.Mesh(geometry, material);
       artworkMesh.position.z = -zOffset - 0.01;
       this.frameGroup.add(artworkMesh);
@@ -418,28 +393,28 @@ class FrameVisualizer {
     const context = canvas.getContext('2d');
     canvas.width = 512;
     canvas.height = 512;
-    
+
     // Create gradient
     const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#3a5a40');
     gradient.addColorStop(1, '#a3b18a');
-    
+
     context.fillStyle = gradient;
     context.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Add text
     context.font = '30px Arial';
     context.fillStyle = 'white';
     context.textAlign = 'center';
     context.fillText('Your Artwork Here', canvas.width / 2, canvas.height / 2);
-    
+
     // Create texture
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.MeshStandardMaterial({
       map: texture,
       roughness: 0.5
     });
-    
+
     const geometry = new THREE.PlaneGeometry(width, height);
     const artworkMesh = new THREE.Mesh(geometry, material);
     artworkMesh.position.z = -zOffset - 0.01;
@@ -449,15 +424,15 @@ class FrameVisualizer {
   addCustomObject(shadowboxDepth) {
     // This would load a custom 3D object from a provided model URL
     if (typeof this.currentConfig.customObject === 'string') {
-      this.gltfLoader.load(this.currentConfig.customObject, (gltf) => {
-        const model = gltf.scene;
-        
-        // Scale and position the model appropriately
-        model.scale.set(0.5, 0.5, 0.5);
-        model.position.z = -shadowboxDepth / 2;
-        
-        this.frameGroup.add(model);
-      });
+      //this.gltfLoader.load(this.currentConfig.customObject, (gltf) => { // kept for potential future use
+      //  const model = gltf.scene;
+
+      //  // Scale and position the model appropriately
+      //  model.scale.set(0.5, 0.5, 0.5);
+      //  model.position.z = -shadowboxDepth / 2;
+
+      //  this.frameGroup.add(model);
+      //});
     }
   }
 
@@ -520,7 +495,7 @@ class FrameVisualizer {
     window.removeEventListener('resize', this.onResize.bind(this));
     this.renderer.dispose();
     this.controls.dispose();
-    
+
     // Clear container
     while (this.container.firstChild) {
       this.container.removeChild(this.container.firstChild);

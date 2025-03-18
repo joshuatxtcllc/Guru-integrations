@@ -65,7 +65,7 @@ app.use('/api/vendors', authMiddleware, require('./routes/api/vendors'));
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
   app.use(express.static('client/build'));
-  
+
   // Serve the index.html file for any route not handled by the API
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
@@ -76,23 +76,8 @@ if (process.env.NODE_ENV === 'production') {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  
-  try {
-    // Initialize product catalog if needed
-    const catalogInitResult = await initializeProductCatalog();
-    console.log('Product catalog initialization:', catalogInitResult.message);
-    
-    // Process any pending notifications
-    const notificationResult = await processPendingNotifications();
-    console.log('Initial notification processing complete:', 
-      notificationResult.success ? 
-      `${notificationResult.processedCount} notifications processed` : 
-      notificationResult.error);
-  } catch (error) {
-    console.error('Error during server initialization:', error);
-  }
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
 // Handle unhandled promise rejections
