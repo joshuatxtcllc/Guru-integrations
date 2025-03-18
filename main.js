@@ -36,8 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function validateForm(event) {
+    event.preventDefault();
     let valid = true;
     const requiredFields = this.querySelectorAll('[required]');
+    
+    // Reset previous error messages
+    const previousErrors = this.querySelectorAll('.error-message');
+    previousErrors.forEach(error => error.remove());
     
     // Reset previous error messages
     const errorMessages = this.querySelectorAll('.error-message');
