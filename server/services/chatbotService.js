@@ -3,7 +3,7 @@ const router = express.Router();
 const { Order } = require('../models/orderSchema');
 const { Customer } = require('../models/orderSchema');
 const dialogflow = require('@google-cloud/dialogflow');
-const config = require('../config/config');
+const config = require('../config/config.js');
 
 // Configure Dialogflow client
 const dialogflowClient = new dialogflow.SessionsClient({
