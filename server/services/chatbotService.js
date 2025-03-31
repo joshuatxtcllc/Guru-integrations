@@ -1,11 +1,15 @@
+
+/**
+ * Frame Guru Chatbot Service
+ * Handles order status inquiries and customer support through an AI-powered chatbot
+ */
+
 const express = require('express');
 const router = express.Router();
-const { Order } = require('../models/orderSchema');
-const { Customer } = require('../models/orderSchema');
+const { Order, Customer } = require('../models/orderSchema');
 const dialogflow = require('@google-cloud/dialogflow');
-const config = require('../config/config.js');
+const config = require('../config/config');
 
-// Configure Dialogflow client
 const dialogflowClient = new dialogflow.SessionsClient({
   credentials: {
     client_email: config.dialogflow.clientEmail,
@@ -13,8 +17,9 @@ const dialogflowClient = new dialogflow.SessionsClient({
   }
 });
 
-const chatSessions = new Map();
-
+/**
+ * Process incoming chat messages and return appropriate responses
+ */
 async function processChatMessage(userId, message) {
   try {
     // Create a session path
@@ -37,12 +42,12 @@ async function processChatMessage(userId, message) {
     // Send request to Dialogflow
     const responses = await dialogflowClient.detectIntent(request);
     const result = responses[0].queryResult;
-
+    
     // Check if we need to fulfill an order status intent
     if (result.intent.displayName === 'order_status') {
       // Extract order number parameter
       const orderNumber = result.parameters.fields.order_number.stringValue;
-
+      
       if (orderNumber) {
         // Fulfill with actual order data
         const orderStatus = await getOrderStatus(orderNumber);
@@ -53,7 +58,7 @@ async function processChatMessage(userId, message) {
         };
       }
     }
-
+    
     // Return the standard response from Dialogflow
     return {
       type: 'text',
@@ -68,28 +73,32 @@ async function processChatMessage(userId, message) {
   }
 }
 
+/**
+ * Get order status information by order number
+ */
 async function getOrderStatus(orderNumber) {
   try {
     const order = await Order.findOne({ orderNumber }).populate('customer');
-
+    
     if (!order) {
       return {
         message: `I couldn't find an order with number ${orderNumber}. Please check the number and try again.`
       };
     }
-
+    
     // Format status message based on current status
     let statusMessage = '';
     let estimatedCompletion = '';
-
+    
     if (order.estimatedCompletion) {
+      // Format date: March 22, 2025
       estimatedCompletion = new Date(order.estimatedCompletion).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
     }
-
+    
     switch (order.currentStatus) {
       case 'placed':
         statusMessage = `Your order #${orderNumber} has been received and is awaiting payment confirmation.`;
@@ -118,7 +127,8 @@ async function getOrderStatus(orderNumber) {
       default:
         statusMessage = `Your order #${orderNumber} is currently being processed.`;
     }
-
+    
+    // Add details about the order
     const orderDetails = {
       orderNumber: order.orderNumber,
       status: order.currentStatus,
@@ -127,11 +137,12 @@ async function getOrderStatus(orderNumber) {
       items: order.items.length,
       total: order.totalAmount.toFixed(2)
     };
-
+    
+    // If the order is shipped, add tracking info
     if (order.currentStatus === 'shipped' && order.trackingNumber) {
       orderDetails.trackingNumber = order.trackingNumber;
     }
-
+    
     return {
       message: statusMessage,
       data: orderDetails
@@ -144,20 +155,24 @@ async function getOrderStatus(orderNumber) {
   }
 }
 
+/**
+ * Handle webhook requests from Dialogflow
+ */
 function handleDialogflowWebhook(req, res) {
   const intent = req.body.queryResult.intent.displayName;
   const parameters = req.body.queryResult.parameters;
-
+  
   async function orderStatusHandler() {
     const orderNumber = parameters.order_number;
-
+    
     if (!orderNumber) {
       return {
         fulfillmentText: 'What\'s your order number? You can find it in your confirmation email.'
       };
     }
-
+    
     try {
+      // Use the getOrderStatus function and respond accordingly
       const statusResult = await getOrderStatus(orderNumber);
       return {
         fulfillmentText: statusResult.message
@@ -169,7 +184,8 @@ function handleDialogflowWebhook(req, res) {
       };
     }
   }
-
+  
+  // Process request based on intent
   const handleIntent = async () => {
     switch (intent) {
       case 'order_status':
@@ -180,7 +196,8 @@ function handleDialogflowWebhook(req, res) {
         };
     }
   };
-
+  
+  // Execute the handler and send the response
   handleIntent()
     .then(response => {
       res.json(response);
@@ -193,18 +210,24 @@ function handleDialogflowWebhook(req, res) {
     });
 }
 
+/**
+ * Chat history management
+ */
+const chatSessions = new Map();
+
 function saveChatMessage(sessionId, message, isUser) {
   if (!chatSessions.has(sessionId)) {
     chatSessions.set(sessionId, []);
   }
-
+  
   const session = chatSessions.get(sessionId);
   session.push({
     message,
     timestamp: new Date(),
     isUser
   });
-
+  
+  // Limit history to last 50 messages
   if (session.length > 50) {
     session.shift();
   }
@@ -214,20 +237,24 @@ function getChatHistory(sessionId) {
   return chatSessions.has(sessionId) ? chatSessions.get(sessionId) : [];
 }
 
+// Express route for chat interactions
 router.post('/message', async (req, res) => {
   try {
     const { userId, message } = req.body;
-
+    
     if (!userId || !message) {
       return res.status(400).json({ error: 'Missing userId or message' });
     }
-
+    
+    // Save user message to history
     saveChatMessage(userId, message, true);
-
+    
+    // Process the message
     const response = await processChatMessage(userId, message);
-
+    
+    // Save bot response to history
     saveChatMessage(userId, response.message, false);
-
+    
     res.json(response);
   } catch (error) {
     console.error('Error in chat endpoint:', error);
@@ -238,11 +265,13 @@ router.post('/message', async (req, res) => {
   }
 });
 
+// Express route for chat history
 router.get('/history/:sessionId', (req, res) => {
   const { sessionId } = req.params;
   res.json(getChatHistory(sessionId));
 });
 
+// Express route for Dialogflow webhook
 router.post('/webhook', handleDialogflowWebhook);
 
 module.exports = {
