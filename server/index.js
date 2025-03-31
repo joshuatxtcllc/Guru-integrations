@@ -61,10 +61,10 @@ app.use('/api/chatbot', chatbotRoutes);
 // Vendor API routes - protected and requiring admin access
 app.use('/api/vendors', authMiddleware, require('./routes/api/vendors'));
 
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
+// Serve static assets in production or development
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
   // Set static folder
-  app.use(express.static('client/build'));
+  app.use(express.static(path.join(__dirname, '../client/build')));
 
   // Serve the index.html file for any route not handled by the API
   app.get('*', (req, res) => {
