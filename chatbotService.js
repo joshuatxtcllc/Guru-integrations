@@ -116,6 +116,42 @@ async function getOrderStatus(orderNumber) {
         statusMessage = `Your order #${orderNumber} is in the final quality check phase.`;
         break;
       case 'ready_for_pickup':
+        statusMessage = `Your order #${orderNumber} is ready for pickup at our store.`;
+        break;
+      case 'shipped':
+        statusMessage = `Your order #${orderNumber} has been shipped${order.trackingNumber ? ` with tracking number ${order.trackingNumber}` : ''}.`;
+        break;
+      case 'delivered':
+        statusMessage = `Your order #${orderNumber} has been delivered.`;
+        break;
+      case 'completed':
+        statusMessage = `Your order #${orderNumber} is complete. Thank you for your business!`;
+        break;
+      case 'cancelled':
+        statusMessage = `Your order #${orderNumber} has been cancelled.`;
+        break;
+      default:
+        statusMessage = `Your order #${orderNumber} status is: ${order.currentStatus}`;
+    }
+    
+    return {
+      message: statusMessage,
+      status: order.currentStatus,
+      estimatedCompletion: estimatedCompletion || null,
+      customer: order.customer ? order.customer.name : null,
+      orderDetails: {
+        items: order.items,
+        total: order.total,
+        orderDate: order.createdAt
+      }
+    };
+  } catch (error) {
+    console.error('Error getting order status:', error);
+    return {
+      message: "I'm sorry, there was a problem retrieving your order information. Please try again later."
+    };
+  }
+}
         statusMessage = `Great news! Your order #${orderNumber} is ready for pickup at our studio.`;
         break;
       case 'shipped':

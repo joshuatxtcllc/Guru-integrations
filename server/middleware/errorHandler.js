@@ -1,3 +1,4 @@
+
 const AppError = class extends Error {
   constructor(message, statusCode) {
     super(message);
