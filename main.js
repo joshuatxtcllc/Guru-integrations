@@ -41,10 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const requiredFields = this.querySelectorAll('[required]');
     
     // Reset previous error messages
-    const previousErrors = this.querySelectorAll('.error-message');
-    previousErrors.forEach(error => error.remove());
-    
-    // Reset previous error messages
     const errorMessages = this.querySelectorAll('.error-message');
     errorMessages.forEach(el => el.remove());
     
