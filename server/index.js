@@ -76,8 +76,10 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developme
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+const serverPort = process.env.PORT || 5000;
+app.listen(serverPort, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${serverPort}`);
+  console.log('If using Replit, visit the webview to see your application');
 });
 
 // Handle unhandled promise rejections
