@@ -1,0 +1,21 @@
+<script>
+    // Remove Replit badge
+    document.addEventListener('DOMContentLoaded', function() {
+      const removeReplitBadge = () => {
+        const badges = document.querySelectorAll('.replit-badge, .replit-badge-container');
+        badges.forEach(badge => badge.remove());
+
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+          if (iframe.src && iframe.src.includes('replit.com')) {
+            iframe.remove();
+          }
+        });
+      };
+
+      // Run immediately and also after a short delay to catch late-loaded elements
+      removeReplitBadge();
+      setTimeout(removeReplitBadge, 1000);
+    });
+  </script>
+</body>

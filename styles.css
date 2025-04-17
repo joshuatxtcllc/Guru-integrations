@@ -17,18 +17,18 @@
   --black-color: #222222;
   --gray-color: #f5f5f5;
   --border-color: #e0e0e0;
-  
+
   /* Typography */
   --heading-font: 'Playfair Display', serif;
   --body-font: 'Montserrat', sans-serif;
-  
+
   /* Spacing */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 2rem;
   --spacing-lg: 4rem;
   --spacing-xl: 8rem;
-  
+
   /* Other */
   --border-radius: 4px;
   --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -587,15 +587,15 @@ button {
   html {
     font-size: 55%;
   }
-  
+
   h1 {
     font-size: 3.6rem;
   }
-  
+
   h2 {
     font-size: 2.8rem;
   }
-  
+
   /* Header */
   .menu-toggle {
     display: block;
@@ -606,7 +606,7 @@ button {
     position: relative;
     z-index: 200;
   }
-  
+
   .hamburger,
   .hamburger:before,
   .hamburger:after {
@@ -616,39 +616,39 @@ button {
     background-color: var(--dark-color);
     transition: var(--transition);
   }
-  
+
   .hamburger {
     position: relative;
   }
-  
+
   .hamburger:before,
   .hamburger:after {
     content: '';
     position: absolute;
   }
-  
+
   .hamburger:before {
     top: -8px;
   }
-  
+
   .hamburger:after {
     bottom: -8px;
   }
-  
+
   .menu-open .hamburger {
     transform: rotate(45deg);
   }
-  
+
   .menu-open .hamburger:before {
     transform: rotate(90deg);
     top: 0;
   }
-  
+
   .menu-open .hamburger:after {
     transform: rotate(90deg);
     bottom: 0;
   }
-  
+
   .nav-menu {
     position: fixed;
     top: 0;
@@ -663,36 +663,36 @@ button {
     transition: var(--transition);
     z-index: 100;
   }
-  
+
   .menu-open .nav-menu {
     right: 0;
   }
-  
+
   .nav-menu li {
     margin: var(--spacing-sm) 0;
   }
-  
+
   /* Hero */
   .hero {
     padding: var(--spacing-lg) 0;
   }
-  
+
   .hero-buttons {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
+
   /* Pricing Table */
   .table-header,
   .table-row {
     grid-template-columns: 1fr 1fr 1fr;
   }
-  
+
   /* Location */
   .location-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .map-container {
     margin-bottom: var(--spacing-md);
   }
@@ -704,34 +704,48 @@ button {
   .table-row {
     grid-template-columns: 1fr;
   }
-  
+
   .table-header {
     display: none;
   }
-  
+
   .cell {
     text-align: left;
     padding: var(--spacing-xs) var(--spacing-sm);
   }
-  
+
   .cell:nth-child(1):before {
     content: "Size: ";
     font-weight: 600;
   }
-  
+
   .cell:nth-child(2):before {
     content: "Price: ";
     font-weight: 600;
   }
-  
+
   /* Events */
   .event-card {
     flex-direction: column;
   }
-  
+
   .event-date {
     margin-right: 0;
     margin-bottom: var(--spacing-sm);
     width: 80px;
   }
+}
+
+/* Add your CSS styles here */
+/* Hide the "Made on Replit" badge */
+.replit-badge {
+  display: none !important;
+}
+
+.replit-badge-container {
+  display: none !important;
+}
+
+iframe[src*="replit.com"] {
+  display: none !important;
 }
